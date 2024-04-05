@@ -119,4 +119,29 @@ contract FundMeTest is StdCheats, Test {
         assert(startingFundMeBalance + startingOwnerBalance == fundMe.getOwner().balance);
         assert((numberOfFunders + 1) * SEND_VALUE == fundMe.getOwner().balance - startingOwnerBalance);
     }
+
+    function testOnlyOwnerCanWithdrawFails() public {
+        vm.prank(USER);
+        fundMe.fund{value: SEND_VALUE}();
+        vm.prank(USER);
+        vm.expectRevert();
+        fundMe.withdraw();
+    }
+
+    function testWithdrawFromMulitpleFounders() public funded {
+        uint160 numberOfFunders = 10;
+        uint256 startingFunderIndex = 1;
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
+            // vm.prank new address
+            // vm.deal new address
+            hoax(address(i),SEND_VALUE);
+            // fund the fundME
+            fundMe.fund{value: SEND_VALUE}();
+
+        }
+    }
+
+    
+
+
 }
